@@ -4,7 +4,7 @@ A GitHub Action that validates Conjur policy files in pull requests and provides
 
 > **Note**: This action uses JWT authentication to securely connect to your Conjur server without storing API keys.
 >
-> See [JWT Migration Guide](docs/jwt-migration.md) and [Local Testing Guide](docs/local-testing.md) for more information.
+> See [Local Testing Guide](docs/local-testing.md) for more information.
 
 ## Features
 

@@ -128,4 +128,4 @@ If you encounter issues:
 3. Ensure the GitHub Actions workflow has the correct permissions
 4. Confirm that your repository name matches exactly what's configured in Conjur
 
-For more details, see the [JWT Migration Guide](jwt-migration.md) and [Local Testing Guide](local-testing.md).
+For more details, see the [Local Testing Guide](local-testing.md).
