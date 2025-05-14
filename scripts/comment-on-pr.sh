@@ -25,7 +25,7 @@ else
   STATUS="## ❌ Policy validation failed - This PR cannot be merged"
 fi
 
-COMMENT_BODY="$HEADER\n\n$STATUS\n\n$VALIDATION_OUTPUT"
+COMMENT_BODY="$HEADER\n\n$STATUS\n\n${VALIDATION_OUTPUT//\"/\\\"}"
 
 # Check for existing comment
 COMMENTS_URL="https://api.github.com/repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments"
