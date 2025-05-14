@@ -1,0 +1,75 @@
+---
+# Sample Conjur policy file
+# This demonstrates proper JWT authentication integration for GitHub Actions
+
+# First, define an application policy
+- !policy
+  id: app1
+  body:
+    - !group admins
+    - !group readers
+    - !group ci-users    # Group for CI/CD systems
+
+    - !user developer1
+    - !user developer2
+    
+    # Host identity for GitHub Actions JWT authentication
+    - !host github-actions
+
+    - !grant
+      role: !group admins
+      members:
+        - !user developer1
+
+    - !grant
+      role: !group readers
+      members:
+        - !user developer2
+        
+    # Grant GitHub Actions identities access to the CI group
+    - !grant
+      role: !group ci-users
+      members:
+        - !host github-actions
+
+    - !variable db/username
+    - !variable db/password
+    - !variable api/key
+
+    - !permit
+      role: !group admins
+      privilege: [read, update]
+      resource: 
+        - !variable db/username
+        - !variable db/password
+        - !variable api/key
+
+    - !permit
+      role: !group readers
+      privilege: [read]
+      resource: 
+        - !variable db/username
+        
+    # Allow CI systems to read secrets they need
+    - !permit
+      role: !group ci-users
+      privilege: [read]
+      resource:
+        - !variable api/key
+        
+# Policy for managing policy updates via JWT authentication
+- !policy
+  id: policy-management
+  body:
+    - !group updaters
+    
+    # Grant GitHub Actions identity ability to update policies
+    - !grant
+      role: !group updaters
+      member: !host app1/github-actions
+      
+    # Grant the updaters group permission to update app1 policy
+    - !permit
+      role: !group updaters
+      privilege: [read, update]
+      resource: !policy app1

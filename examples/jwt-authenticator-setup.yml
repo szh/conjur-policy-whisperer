@@ -1,0 +1,44 @@
+# Setup for JWT authentication in Conjur for GitHub Actions
+# This file shows how to configure Conjur to accept JWT tokens from GitHub Actions
+
+# First, create a JWT authenticator policy for GitHub Actions
+- !policy
+  id: conjur/authn-jwt/github
+  body:
+  - !webservice
+
+  - !variable
+    id: jwks-uri
+  
+  - !variable
+    id: token-app-property
+  
+  - !variable
+    id: identity-path
+  
+  - !group
+    id: apps
+    
+  - !permit
+    role: !group apps
+    privilege: [ read, authenticate ]
+    resource: !webservice
+
+# Next, create a policy for your GitHub repository
+- !policy
+  id: github-actions
+  body:
+  - !host
+    id: your-org/your-repo
+    annotations:
+      repository: your-org/your-repo
+  
+  # Grant this host permission to authenticate using the JWT authenticator
+  - !grant
+    role: !group conjur/authn-jwt/github/apps
+    member: !host your-org/your-repo
+  
+  # Optional: Grant this host permission to load/validate specific policies
+  - !grant
+    role: !group policy/your-policy-branch/update
+    member: !host your-org/your-repo

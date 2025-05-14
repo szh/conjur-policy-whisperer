@@ -1,0 +1,34 @@
+name: Validate Conjur Policies
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - '**.yml'
+      - '**.yaml'
+
+jobs:
+  validate-conjur-policies:
+    name: Validate Conjur Policies
+    runs-on: ubuntu-latest
+    
+    # These permissions are needed for JWT authentication and PR comments
+    permissions:
+      id-token: write  # Required for JWT authentication
+      contents: read   # Required to read code
+      pull-requests: write  # Required to comment on PRs
+      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Required to detect changes between branches
+
+      - name: Validate Conjur Policy Files
+        uses: your-org/conjur-policy-whisperer@v1
+        with:
+          conjur_url: ${{ secrets.CONJUR_URL }}
+          conjur_account: ${{ secrets.CONJUR_ACCOUNT }}
+          conjur_jwt_service_id: ${{ secrets.CONJUR_JWT_SERVICE_ID }} # Typically 'github'
+          policy_dir: './conjur/policies'  # Adjust to your policy directory
+          # Note: The GitHub token is automatically used for JWT authentication

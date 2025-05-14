@@ -1,0 +1,65 @@
+name: 'Conjur Policy Validator'
+description: 'Validates Conjur policy files and comments on PR with results'
+author: 'CyberArk'
+inputs:
+  conjur_url:
+    description: 'URL of Conjur'
+    required: true
+  conjur_account:
+    description: 'Conjur account'
+    required: true
+  conjur_jwt_service_id:
+    description: 'Conjur JWT Authenticator service ID'
+    required: true
+  github_token:
+    description: 'GitHub token for PR comments and JWT authentication'
+    required: true
+    default: ${{ github.token }}
+  policy_dir:
+    description: 'Directory containing policy files'
+    required: false
+    default: '.'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    
+    - name: Set up Docker
+      uses: docker/setup-buildx-action@v2
+
+    - name: Detect changed policy files
+      id: detect-changes
+      shell: bash
+      run: ${{ github.action_path }}/scripts/detect-policy-changes.sh
+      env:
+        POLICY_DIR: ${{ inputs.policy_dir }}
+        
+    - name: Validate Conjur policies
+      id: validate-policies
+      if: steps.detect-changes.outputs.has_policy_changes == 'true'
+      shell: bash
+      run: ${{ github.action_path }}/scripts/validate-policies.sh
+      env:
+        CONJUR_URL: ${{ inputs.conjur_url }}
+        CONJUR_ACCOUNT: ${{ inputs.conjur_account }}
+        CONJUR_JWT_SERVICE_ID: ${{ inputs.conjur_jwt_service_id }}
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+        CHANGED_POLICIES: ${{ steps.detect-changes.outputs.changed_policies }}
+        
+    - name: Comment on PR
+      if: steps.detect-changes.outputs.has_policy_changes == 'true'
+      shell: bash
+      run: ${{ github.action_path }}/scripts/comment-on-pr.sh
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+        VALIDATION_RESULT: ${{ steps.validate-policies.outputs.validation_result }}
+        VALIDATION_OUTPUT: ${{ steps.validate-policies.outputs.validation_output }}
+        VALIDATION_SUCCESS: ${{ steps.validate-policies.outputs.validation_success }}
+
+branding:
+  icon: 'shield'
+  color: 'blue'
