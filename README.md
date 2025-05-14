@@ -158,6 +158,26 @@ If validation fails, the PR will be blocked from merging:
 ```
 ```
 
+## Additional Tools
+
+### Policy PR Creator Script
+
+The repository includes a Python script that lets you create PRs for new or updated Conjur policy files:
+
+```bash
+# Install dependencies
+pip install -r scripts/requirements.txt
+
+# Create a PR with a policy file
+scripts/create_policy_pr.py \
+  --file path/to/policy.yml \
+  --repo-owner your-org \
+  --repo-name your-repo \
+  --dest-path policies/app1.yml
+```
+
+For detailed usage instructions, see [PR Creator Documentation](scripts/PR_CREATOR_README.md).
+
 ## License
 
 MIT

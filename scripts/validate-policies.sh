@@ -37,50 +37,38 @@ for POLICY_FILE in $CHANGED_POLICIES; do
   # Generate JWT token for GitHub Actions
   
   # Run the policy validation using the Conjur CLI in Docker with JWT authentication
-  JWT_TOKEN=$(curl -s -H "Authorization:bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL" | jq -r .value)
-    if [ -z "$JWT_TOKEN" ]; then
-        echo "Error: Failed to obtain JWT token."
-        echo "false" > "$SUCCESS_FILE"
-        echo "error" > "$RESULT_FILE"
-        echo "::set-output name=validation_output::Failed to obtain JWT token."
-        exit 1
-    fi
+  JWT_TOKEN=$(curl -s -k -H "Authorization:bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL" | jq -r .value)
+  if [ -z "$JWT_TOKEN" ]; then
+      echo "Error: Failed to obtain JWT token."
+      echo "false" > "$SUCCESS_FILE"
+      echo "error" > "$RESULT_FILE"
+      echo "::set-output name=validation_output::Failed to obtain JWT token."
+      exit 1
+  fi
 
-    docker pull cyberark/conjur-cli:latest
+  authn_jwt_url="$CONJUR_URL/authn-jwt/$CONJUR_JWT_SERVICE_ID/$CONJUR_ACCOUNT/authenticate"
+  SESSION_TOKEN=$(curl -s -k -X POST $authn_jwt_url -H "Content-Type:application/x-www-form-urlencoded" -H "Accept-Encoding:base64" --data-urlencode "jwt=${JWT_TOKEN}")
+  if [ -z "$SESSION_TOKEN" ]; then
+      echo "Error: Failed to obtain session token."
+      echo "false" > "$SUCCESS_FILE"
+      echo "error" > "$RESULT_FILE"
+      echo "::set-output name=validation_output::Failed to obtain session token."
+      exit 1
+  fi
 
-    # Write the JWT token to a temporary file
-    echo "$JWT_TOKEN" > ".jwt_token"
-
-    init_command="echo y | conjur init -u $CONJUR_URL -a $CONJUR_ACCOUNT -t jwt --service-id $CONJUR_JWT_SERVICE_ID --jwt-file /conjur/.jwt_token --self-signed"
-
-    if ! docker run --rm \
-      -e CONJURRC="/conjur/.conjurrc" \
-      -v "$(pwd):/conjur" \
-      -v /var/run/docker.sock:/var/run/docker.sock \
-      --entrypoint /bin/bash \
-      cyberark/conjur-cli:latest \
-      -c "$init_command"; then
-        echo "Error: Failed to initialize Conjur CLI."
-        echo "false" > "$SUCCESS_FILE"
-        echo "error" > "$RESULT_FILE"
-        echo "::set-output name=validation_output::Failed to initialize Conjur CLI."
-        exit 1
-    fi
-
-    if ! docker run --rm \
-      -e CONJURRC="/conjur/.conjurrc" \
-      -v "$(pwd):/conjur" \
-      -v /var/run/docker.sock:/var/run/docker.sock \
-      cyberark/conjur-cli:latest \
-      policy load --dry-run -b "$POLICY_BRANCH" -f "/conjur/$POLICY_FILE" > "$TEMP_OUTPUT" 2>&1; then
-    
-    # Policy validation failed
-    echo "false" > "$SUCCESS_FILE"
-    echo "failure" > "$RESULT_FILE"
-    echo -e "\n## ❌ Policy validation failed for: $POLICY_FILE\n\n\`\`\`\n$(cat "$TEMP_OUTPUT")\n\`\`\`" >> "$OUTPUT_FILE"
+  if ! curl -k -H "Authorization:Token token=\"${SESSION_TOKEN}\"" -X POST "$CONJUR_URL/policies/${CONJUR_ACCOUNT}/policy/whisper?dryRun=true" -d "$(cat $POLICY_FILE)"
+  then
+      echo "Error: Policy validation failed."
+      echo "false" > "$SUCCESS_FILE"
+      echo "error" > "$RESULT_FILE"
+      echo "::set-output name=validation_output::Policy validation failed."
+      exit 1
   else
     # Policy validation succeeded
     echo -e "\n## ✅ Policy validation succeeded for: $POLICY_FILE\n\n\`\`\`\n$(cat "$TEMP_OUTPUT")\n\`\`\`" >> "$OUTPUT_FILE"
+    echo "true" > "$SUCCESS_FILE"
+    echo "success" > "$RESULT_FILE"
+    echo "::set-output name=validation_output::Policy validation succeeded."
   fi
 done
 
