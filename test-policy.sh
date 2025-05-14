@@ -46,7 +46,7 @@ echo
 
 # Run the policy validation
 echo "Running dry-run validation with JWT authentication..."
-local JWT_TOKEN=$( curl -s -H "Authorization:bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL" | jq -r .value )
+JWT_TOKEN=$( curl -s -H "Authorization:bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL" | jq -r .value )
 if docker run --rm \
     -e CONJUR_APPLIANCE_URL="$CONJUR_URL" \
     -e CONJUR_ACCOUNT="$CONJUR_ACCOUNT" \
