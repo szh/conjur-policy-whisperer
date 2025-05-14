@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -ex
 
 # Default policy directory
 POLICY_DIR=${POLICY_DIR:-.}

@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -ex
 
 # Check required environment variables
 if [ -z "$CONJUR_URL" ] || [ -z "$CONJUR_ACCOUNT" ] || [ -z "$CONJUR_JWT_SERVICE_ID" ] || [ -z "$GITHUB_TOKEN" ]; then
@@ -52,13 +52,18 @@ appliance_url: $CONJUR_URL
 account: $CONJUR_ACCOUNT
 authn_type: jwt
 service_id: $CONJUR_JWT_SERVICE_ID
-jwt_file: $JWT_TOKEN
+jwt_file: /conjur/.jwt_token
+http_timeout: 60
 EOF
-    docker pull cyberark/conjur-cli:latest
+
+    # Write the JWT token to a temporary file
+    echo "$JWT_TOKEN" > ".jwt_token"
+
+    docker pull cyberark/conjur-cli:8.0.16
     if ! docker run --rm \
       -e CONJURRC="/conjur/.conjurrc" \
       -v "$(pwd):/conjur" \
-      cyberark/conjur-cli:latest \
+      cyberark/conjur-cli:8.0.16 \
       policy load --dry-run -b "$POLICY_BRANCH" -f "/conjur/$POLICY_FILE" > "$TEMP_OUTPUT" 2>&1; then
     
     # Policy validation failed
