@@ -46,24 +46,32 @@ for POLICY_FILE in $CHANGED_POLICIES; do
         exit 1
     fi
 
-    # Create a .conjurrc file for the Conjur CLI
-    cat <<EOF > ".conjurrc"
-appliance_url: $CONJUR_URL
-account: $CONJUR_ACCOUNT
-authn_type: jwt
-service_id: $CONJUR_JWT_SERVICE_ID
-jwt_file: /conjur/.jwt_token
-http_timeout: 60
-EOF
+    docker pull cyberark/conjur-cli:latest
 
     # Write the JWT token to a temporary file
     echo "$JWT_TOKEN" > ".jwt_token"
 
-    docker pull cyberark/conjur-cli:8.0.16
+    init_command="echo y | conjur init -u $CONJUR_URL -a $CONJUR_ACCOUNT -t jwt --service-id $CONJUR_JWT_SERVICE_ID --jwt-file /conjur/.jwt_token --self-signed"
+
     if ! docker run --rm \
       -e CONJURRC="/conjur/.conjurrc" \
       -v "$(pwd):/conjur" \
-      cyberark/conjur-cli:8.0.16 \
+      -v /var/run/docker.sock:/var/run/docker.sock \
+      --entrypoint /bin/bash \
+      cyberark/conjur-cli:latest \
+      -c "$init_command"; then
+        echo "Error: Failed to initialize Conjur CLI."
+        echo "false" > "$SUCCESS_FILE"
+        echo "error" > "$RESULT_FILE"
+        echo "::set-output name=validation_output::Failed to initialize Conjur CLI."
+        exit 1
+    fi
+
+    if ! docker run --rm \
+      -e CONJURRC="/conjur/.conjurrc" \
+      -v "$(pwd):/conjur" \
+      -v /var/run/docker.sock:/var/run/docker.sock \
+      cyberark/conjur-cli:latest \
       policy load --dry-run -b "$POLICY_BRANCH" -f "/conjur/$POLICY_FILE" > "$TEMP_OUTPUT" 2>&1; then
     
     # Policy validation failed
