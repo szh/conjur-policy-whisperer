@@ -23,8 +23,12 @@ echo "" > "$OUTPUT_FILE"  # Start with empty output
 mkdir -p "$TEMP_DIR"
 
 # Process each changed policy file
-IFS=$'\n'
-for POLICY_FILE in $CHANGED_POLICIES; do
+IFS=','
+POLICY_FILES=()
+while read -r line; do
+    POLICY_FILES+=("$line")
+done <<< "$CHANGED_POLICIES"
+for POLICY_FILE in "${POLICY_FILES[@]}"; do
   echo "Validating policy: $POLICY_FILE"
   
   # Extract policy branch name from file path
@@ -56,7 +60,7 @@ for POLICY_FILE in $CHANGED_POLICIES; do
       exit 1
   fi
 
-  if ! curl -k -H "Authorization:Token token=\"${SESSION_TOKEN}\"" -X POST "$CONJUR_URL/policies/${CONJUR_ACCOUNT}/policy/whisper?dryRun=true" -d "$(cat $POLICY_FILE)"
+  if ! curl -k -H "Authorization:Token token=\"${SESSION_TOKEN}\"" -X POST "$CONJUR_URL/policies/${CONJUR_ACCOUNT}/policy/whisper?dryRun=true" -d "$(cat $POLICY_FILE)" > "$TEMP_OUTPUT"
   then
       echo "Error: Policy validation failed."
       echo "false" > "$SUCCESS_FILE"
