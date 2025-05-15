@@ -1,0 +1,102 @@
+{
+  "authn": [
+    "authn-azure.yml",
+    "authn-gcp.yml",
+    "authn-iam-prod.yml",
+    "authn-jwt-github.yml",
+    "authn-jwt-gitlab.yml",
+    "authn-jwt-jenkins.yml",
+    "authn-k8s.yml",
+    "authn-oidc-webapp.yml",
+    "seed-generation.yml"
+  ],
+  "cd": {
+    "ansible": [
+      "ansible.yml",
+      "ops-team-1.yml",
+      "ops-team-2.yml",
+      "os-patching.yml"
+    ],
+    "kubernetes": [
+      "api-app.yml",
+      "k8s-secrets-app.yml",
+      "kubernetes.yml",
+      "secretless-app.yml",
+      "summon-app.yml"
+    ],
+    "terraform": [
+      "aws.yml",
+      "terraform.yml"
+    ]
+  },
+  "ci": {
+    "github": [
+      "actions.yml",
+      "github.yml",
+      "infamousjoeg.yml"
+    ],
+    "gitlab": [
+      "gitlab.yml",
+      "root.yml"
+    ],
+    "jenkins": [
+      "dev-team-1.yml",
+      "dev-team-2.yml",
+      "jenkins.yml",
+      "projects.yml"
+    ],
+    "refactr": [
+      "onboarding.yml",
+      "refactr.yml"
+    ]
+  },
+  "cloud": {
+    "aws": [
+      "aws.yml",
+      "ec2.yml",
+      "ecs.yml",
+      "lambda.yml"
+    ],
+    "azure": [
+      "azure.yml",
+      "devops.yml",
+      "function.yml"
+    ],
+    "gcp": [
+      "compute.yml",
+      "function.yml",
+      "gcp.yml"
+    ],
+    "thales": [
+      "thales.yml"
+    ]
+  },
+  "delete": [
+    "delete-jenkins.yml",
+    "delete-root.yml",
+    "delete-Sync_PASAAS-PVWA.yml",
+    "delete-sync-lob_cicd.yml",
+    "README.md"
+  ],
+  "grants": [
+    "grants_authn.yml",
+    "grants_cd.yml",
+    "grants_ci.yml",
+    "grants_host.yml",
+    "grants_user.yml",
+    "grants_vcs.yml",
+    "README.md"
+  ],
+  "web": [
+    "conjur-oidc-demo.yml"
+  ],
+  "root_files": [
+    "groups.yml",
+    "Jenkinsfile",
+    "LICENSE",
+    "load_policies.sh",
+    "README.md",
+    "root.yml",
+    "users.yml"
+  ]
+}

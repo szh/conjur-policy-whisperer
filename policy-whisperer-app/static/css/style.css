@@ -1,0 +1,128 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+}
+
+.navbar-brand {
+    font-weight: 600;
+}
+
+.card {
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+    font-weight: 600;
+}
+
+pre {
+    background-color: #f8f9fa;
+    border-radius: 6px;
+    padding: 15px;
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+#policyOutput {
+    min-height: 300px;
+}
+
+.footer {
+    background-color: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+}
+
+.use-example {
+    margin-top: 10px;
+}
+
+/* Loading indicator styles */
+#loadingIndicator {
+    padding: 40px 0;
+}
+
+/* Highlight.js overrides */
+.hljs {
+    background-color: #f8f9fa !important;
+    padding: 0 !important;
+}
+
+/* Policy explanation styles */
+#policyExplanation {
+    min-height: 150px;
+}
+
+/* Markdown explanation styling */
+.markdown-explanation {
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.markdown-explanation h1 {
+    font-size: 1.5rem;
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.markdown-explanation h2 {
+    font-size: 1.25rem;
+    margin-top: 1rem;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+}
+
+.markdown-explanation h3,
+.markdown-explanation h4 {
+    font-size: 1.1rem;
+    margin-top: 0.75rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.markdown-explanation ul,
+.markdown-explanation ol {
+    padding-left: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.markdown-explanation li {
+    margin-bottom: 0.25rem;
+}
+
+.markdown-explanation p {
+    margin-bottom: 0.75rem;
+}
+
+.markdown-explanation code {
+    background-color: #f0f0f0;
+    padding: 0.2rem 0.4rem;
+    border-radius: 3px;
+    font-size: 0.9em;
+}
+
+.markdown-explanation pre code {
+    display: block;
+    padding: 0.75rem;
+    overflow-x: auto;
+    background-color: #f8f9fa;
+    border-radius: 6px;
+}
+
+.markdown-explanation blockquote {
+    border-left: 4px solid #dfe2e5;
+    padding-left: 1rem;
+    color: #6c757d;
+    margin-left: 0;
+    margin-right: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+    .col-lg-6 {
+        margin-bottom: 20px;
+    }
+}
