@@ -1,3 +1,5 @@
+**Warning**: This is a very early draft that was mostly vibe-coded for a hackathon project. It is not production-ready and should not be used as-is. Do not use for any serious purpose. :D
+
 # Conjur Policy Whisperer
 
 A GitHub Action that validates Conjur policy files in pull requests and provides detailed feedback.
